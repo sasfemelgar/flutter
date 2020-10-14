@@ -6,15 +6,22 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
+import 'package:process/process.dart';
 import 'package:vm_service/vm_service.dart' as vm_service;
 
 import 'android/android_device_discovery.dart';
+import 'android/android_sdk.dart';
 import 'android/android_workflow.dart';
 import 'application_package.dart';
 import 'artifacts.dart';
+import 'base/common.dart';
+import 'base/config.dart';
 import 'base/context.dart';
+import 'base/dds.dart';
 import 'base/file_system.dart';
 import 'base/io.dart';
+import 'base/logger.dart';
+import 'base/platform.dart';
 import 'base/user_messages.dart';
 import 'base/utils.dart';
 import 'build_info.dart';
@@ -24,11 +31,15 @@ import 'fuchsia/fuchsia_sdk.dart';
 import 'fuchsia/fuchsia_workflow.dart';
 import 'globals.dart' as globals;
 import 'ios/devices.dart';
+import 'ios/ios_workflow.dart';
 import 'ios/simulators.dart';
 import 'linux/linux_device.dart';
 import 'macos/macos_device.dart';
+import 'macos/macos_workflow.dart';
+import 'macos/xcode.dart';
 import 'project.dart';
 import 'tester/flutter_tester.dart';
+import 'version.dart';
 import 'web/web_device.dart';
 import 'windows/windows_device.dart';
 
@@ -95,23 +106,51 @@ abstract class DeviceManager {
   bool get hasSpecifiedAllDevices => _specifiedDeviceId == 'all';
 
   Future<List<Device>> getDevicesById(String deviceId) async {
-    final List<Device> devices = await getAllConnectedDevices();
-    deviceId = deviceId.toLowerCase();
+    final String lowerDeviceId = deviceId.toLowerCase();
     bool exactlyMatchesDeviceId(Device device) =>
-        device.id.toLowerCase() == deviceId ||
-        device.name.toLowerCase() == deviceId;
+        device.id.toLowerCase() == lowerDeviceId ||
+        device.name.toLowerCase() == lowerDeviceId;
     bool startsWithDeviceId(Device device) =>
-        device.id.toLowerCase().startsWith(deviceId) ||
-        device.name.toLowerCase().startsWith(deviceId);
+        device.id.toLowerCase().startsWith(lowerDeviceId) ||
+        device.name.toLowerCase().startsWith(lowerDeviceId);
 
-    final Device exactMatch = devices.firstWhere(
-        exactlyMatchesDeviceId, orElse: () => null);
-    if (exactMatch != null) {
-      return <Device>[exactMatch];
+    // Some discoverers have hard-coded device IDs and return quickly, and others
+    // shell out to other processes and can take longer.
+    // Process discoverers as they can return results, so if an exact match is
+    // found quickly, we don't wait for all the discoverers to complete.
+    final List<Device> prefixMatches = <Device>[];
+    final Completer<Device> exactMatchCompleter = Completer<Device>();
+    final List<Future<List<Device>>> futureDevices = <Future<List<Device>>>[
+      for (final DeviceDiscovery discoverer in _platformDiscoverers)
+        discoverer
+        .devices
+        .then((List<Device> devices) {
+          for (final Device device in devices) {
+            if (exactlyMatchesDeviceId(device)) {
+              exactMatchCompleter.complete(device);
+              return null;
+            }
+            if (startsWithDeviceId(device)) {
+              prefixMatches.add(device);
+            }
+          }
+          return null;
+        }, onError: (dynamic error, StackTrace stackTrace) {
+          // Return matches from other discoverers even if one fails.
+          globals.printTrace('Ignored error discovering $deviceId: $error');
+        })
+    ];
+
+    // Wait for an exact match, or for all discoverers to return results.
+    await Future.any<dynamic>(<Future<dynamic>>[
+      exactMatchCompleter.future,
+      Future.wait<List<Device>>(futureDevices),
+    ]);
+
+    if (exactMatchCompleter.isCompleted) {
+      return <Device>[await exactMatchCompleter.future];
     }
-
-    // Match on a id or name starting with [deviceId].
-    return devices.where(startsWithDeviceId).toList();
+    return prefixMatches;
   }
 
   /// Returns the list of connected devices, filtered by any user-specified device id.
@@ -171,7 +210,12 @@ abstract class DeviceManager {
   /// * If the user did not specify a device id and there is more than one
   /// device connected, then filter out unsupported devices and prioritize
   /// ephemeral devices.
-  Future<List<Device>> findTargetDevices(FlutterProject flutterProject) async {
+  Future<List<Device>> findTargetDevices(FlutterProject flutterProject, { Duration timeout }) async {
+    if (timeout != null) {
+      // Reset the cache with the specified timeout.
+      await refreshAllConnectedDevices(timeout: timeout);
+    }
+
     List<Device> devices = await getDevices();
 
     // Always remove web and fuchsia devices from `--all`. This setting
@@ -230,7 +274,7 @@ abstract class DeviceManager {
         globals.printStatus(globals.userMessages.flutterMultipleDevicesFound);
         await Device.printDevices(devices);
         final Device chosenDevice = await _chooseOneOfAvailableDevices(devices);
-        deviceManager.specifiedDeviceId = chosenDevice.id;
+        globals.deviceManager.specifiedDeviceId = chosenDevice.id;
         devices = <Device>[chosenDevice];
       }
     }
@@ -240,6 +284,9 @@ abstract class DeviceManager {
   Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async {
     _displayDeviceOptions(devices);
     final String userInput =  await _readUserInput(devices.length);
+    if (userInput.toLowerCase() == 'q') {
+      throwToolExit('');
+    }
     return devices[int.parse(userInput)];
   }
 
@@ -254,7 +301,8 @@ abstract class DeviceManager {
   Future<String> _readUserInput(int deviceCount) async {
     globals.terminal.usesTerminalUi = true;
     final String result = await globals.terminal.promptForCharInput(
-        <String>[ for (int i = 0; i < deviceCount; i++) '$i' ],
+        <String>[ for (int i = 0; i < deviceCount; i++) '$i', 'q', 'Q'],
+        displayAcceptedCharacters: false,
         logger: globals.logger,
         prompt: userMessages.flutterChooseOne);
     return result;
@@ -269,6 +317,7 @@ abstract class DeviceManager {
 }
 
 class FlutterDeviceManager extends DeviceManager {
+<<<<<<< HEAD
   @override
   final List<DeviceDiscovery> deviceDiscoverers = <DeviceDiscovery>[
     AndroidDevices(
@@ -295,16 +344,87 @@ class FlutterDeviceManager extends DeviceManager {
     LinuxDevices(
       platform: globals.platform,
       featureFlags: featureFlags,
+=======
+  FlutterDeviceManager({
+    @required Logger logger,
+    @required Platform platform,
+    @required ProcessManager processManager,
+    @required FileSystem fileSystem,
+    @required AndroidSdk androidSdk,
+    @required FeatureFlags featureFlags,
+    @required IOSSimulatorUtils iosSimulatorUtils,
+    @required XCDevice xcDevice,
+    @required AndroidWorkflow androidWorkflow,
+    @required IOSWorkflow iosWorkflow,
+    @required FuchsiaWorkflow fuchsiaWorkflow,
+    @required FlutterVersion flutterVersion,
+    @required Config config,
+    @required Artifacts artifacts,
+    @required MacOSWorkflow macOSWorkflow,
+  }) : deviceDiscoverers =  <DeviceDiscovery>[
+    AndroidDevices(
+      logger: logger,
+      androidSdk: androidSdk,
+      androidWorkflow: androidWorkflow,
+      processManager: processManager,
+    ),
+    IOSDevices(
+      platform: platform,
+      xcdevice: xcDevice,
+      iosWorkflow: iosWorkflow,
+      logger: logger,
+    ),
+    IOSSimulators(
+      iosSimulatorUtils: iosSimulatorUtils,
+    ),
+    FuchsiaDevices(
+      fuchsiaSdk: fuchsiaSdk,
+      logger: logger,
+      fuchsiaWorkflow: fuchsiaWorkflow,
+      platform: platform,
+    ),
+    FlutterTesterDevices(
+      fileSystem: fileSystem,
+      flutterVersion: flutterVersion,
+      processManager: processManager,
+      config: config,
+      logger: logger,
+      artifacts: artifacts,
+    ),
+    MacOSDevices(
+      processManager: processManager,
+      macOSWorkflow: macOSWorkflow,
+      logger: logger,
+      platform: platform,
+    ),
+    LinuxDevices(
+      platform: platform,
+      featureFlags: featureFlags,
+      processManager: processManager,
+      logger: logger,
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
     ),
     WindowsDevices(),
     WebDevices(
       featureFlags: featureFlags,
+<<<<<<< HEAD
       fileSystem: globals.fs,
       platform: globals.platform,
       processManager: globals.processManager,
       logger: globals.logger,
     ),
   ];
+=======
+      fileSystem: fileSystem,
+      platform: platform,
+      processManager: processManager,
+      logger: logger,
+    ),
+  ];
+
+  @override
+  final List<DeviceDiscovery> deviceDiscoverers;
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
 }
 
 /// An abstract class to discover and enumerate a specific type of devices.
@@ -485,7 +605,7 @@ abstract class Device {
     String userIdentifier,
   });
 
-  /// Check if the device is supported by Flutter
+  /// Check if the device is supported by Flutter.
   bool isSupported();
 
   // String meant to be displayed to the user indicating if the device is
@@ -512,6 +632,12 @@ abstract class Device {
 
   /// Get the port forwarder for this device.
   DevicePortForwarder get portForwarder;
+
+  /// Get the DDS instance for this device.
+  DartDevelopmentService get dds => _dds ??= DartDevelopmentService(
+    logger: globals.logger,
+  );
+  DartDevelopmentService _dds;
 
   /// Clear the device's logs.
   void clearLogs();
@@ -656,7 +782,7 @@ abstract class Device {
     };
   }
 
-  /// Clean up resources allocated by device
+  /// Clean up resources allocated by device.
   ///
   /// For example log readers or port forwarders.
   Future<void> dispose();
@@ -686,6 +812,7 @@ class DebuggingOptions {
     this.buildInfo, {
     this.startPaused = false,
     this.disableServiceAuthCodes = false,
+    this.disableDds = false,
     this.dartFlags = '',
     this.enableSoftwareRendering = false,
     this.skiaDeterministicRendering = false,
@@ -695,6 +822,7 @@ class DebuggingOptions {
     this.endlessTraceBuffer = false,
     this.dumpSkpOnShaderCompilation = false,
     this.cacheSkSL = false,
+    this.purgePersistentCache = false,
     this.useTestFonts = false,
     this.verboseSystemLogs = false,
     this.hostVmServicePort,
@@ -704,11 +832,13 @@ class DebuggingOptions {
     this.port,
     this.webEnableExposeUrl,
     this.webUseSseForDebugProxy = true,
+    this.webUseSseForDebugBackend = true,
     this.webRunHeadless = false,
     this.webBrowserDebugPort,
     this.webEnableExpressionEvaluation = false,
     this.vmserviceOutFile,
     this.fastStart = false,
+    this.nullAssertions = false,
    }) : debuggingEnabled = true;
 
   DebuggingOptions.disabled(this.buildInfo, {
@@ -717,6 +847,7 @@ class DebuggingOptions {
       this.hostname,
       this.webEnableExposeUrl,
       this.webUseSseForDebugProxy = true,
+      this.webUseSseForDebugBackend = true,
       this.webRunHeadless = false,
       this.webBrowserDebugPort,
       this.cacheSkSL = false,
@@ -726,18 +857,21 @@ class DebuggingOptions {
       startPaused = false,
       dartFlags = '',
       disableServiceAuthCodes = false,
+      disableDds = false,
       enableSoftwareRendering = false,
       skiaDeterministicRendering = false,
       traceSkia = false,
       traceSystrace = false,
       endlessTraceBuffer = false,
       dumpSkpOnShaderCompilation = false,
+      purgePersistentCache = false,
       verboseSystemLogs = false,
       hostVmServicePort = null,
       deviceVmServicePort = null,
       vmserviceOutFile = null,
       fastStart = false,
-      webEnableExpressionEvaluation = false;
+      webEnableExpressionEvaluation = false,
+      nullAssertions = false;
 
   final bool debuggingEnabled;
 
@@ -745,6 +879,7 @@ class DebuggingOptions {
   final bool startPaused;
   final String dartFlags;
   final bool disableServiceAuthCodes;
+  final bool disableDds;
   final bool enableSoftwareRendering;
   final bool skiaDeterministicRendering;
   final bool traceSkia;
@@ -753,6 +888,7 @@ class DebuggingOptions {
   final bool endlessTraceBuffer;
   final bool dumpSkpOnShaderCompilation;
   final bool cacheSkSL;
+  final bool purgePersistentCache;
   final bool useTestFonts;
   final bool verboseSystemLogs;
   /// Whether to invoke webOnlyInitializePlatform in Flutter for web.
@@ -763,6 +899,7 @@ class DebuggingOptions {
   final String hostname;
   final bool webEnableExposeUrl;
   final bool webUseSseForDebugProxy;
+  final bool webUseSseForDebugBackend;
 
   /// Whether to run the browser in headless mode.
   ///
@@ -774,12 +911,14 @@ class DebuggingOptions {
   /// The port the browser should use for its debugging protocol.
   final int webBrowserDebugPort;
 
-  /// Enable expression evaluation for web target
+  /// Enable expression evaluation for web target.
   final bool webEnableExpressionEvaluation;
 
   /// A file where the vmservice URL should be written after the application is started.
   final String vmserviceOutFile;
   final bool fastStart;
+
+  final bool nullAssertions;
 
   bool get hasObservatoryPort => hostVmServicePort != null;
 }
@@ -838,7 +977,7 @@ abstract class DevicePortForwarder {
   /// Stops forwarding [forwardedPort].
   Future<void> unforward(ForwardedPort forwardedPort);
 
-  /// Cleanup allocated resources, like forwardedPorts
+  /// Cleanup allocated resources, like [forwardedPorts].
   Future<void> dispose();
 }
 
@@ -905,4 +1044,15 @@ class NoOpDevicePortForwarder implements DevicePortForwarder {
 
   @override
   Future<void> dispose() async { }
+}
+
+/// Append --null_assertions to any existing Dart VM flags if
+/// [debuggingOptions.nullAssertions] is true.
+String computeDartVmFlags(DebuggingOptions debuggingOptions) {
+  return <String>[
+    if (debuggingOptions.dartFlags?.isNotEmpty ?? false)
+      debuggingOptions.dartFlags,
+    if (debuggingOptions.nullAssertions)
+      '--null_assertions',
+  ].join(',');
 }

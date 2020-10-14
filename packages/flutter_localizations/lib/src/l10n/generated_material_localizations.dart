@@ -7741,6 +7741,24 @@ class MaterialLocalizationEsUs extends MaterialLocalizationEs {
 
   @override
   String get licensesPackageDetailTextOne => '1 licencia';
+<<<<<<< HEAD
+
+  @override
+  String get timePickerInputHelpText => 'INGRESAR HORA';
+
+  @override
+  String get invalidTimeLabel => 'Ingresa una hora válida';
+
+  @override
+  String get licensesPackageDetailTextOther => '\$licenseCount licencias';
+
+  @override
+  String get inputTimeModeButtonLabel => 'Cambiar al modo de entrada de texto';
+
+  @override
+  String get dateInputLabel => 'Ingresar fecha';
+=======
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
 
   @override
   String get timePickerInputHelpText => 'INGRESAR HORA';
@@ -12313,6 +12331,18 @@ class MaterialLocalizationHy extends GlobalMaterialLocalizations {
 
   @override
   String get licensesPackageDetailTextMany => null;
+<<<<<<< HEAD
+
+  @override
+  String get licensesPackageDetailTextOne => '1 լիցենզիա';
+
+  @override
+  String get licensesPackageDetailTextOther => '\$licenseCount լիցենզիա';
+
+  @override
+  String get licensesPackageDetailTextTwo => null;
+=======
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
 
   @override
   String get licensesPackageDetailTextOne => '1 լիցենզիա';
@@ -18301,7 +18331,7 @@ class MaterialLocalizationMy extends GlobalMaterialLocalizations {
 }
 
 /// The translations for Norwegian Bokmål (`nb`).
-class MaterialLocalizationNb extends MaterialLocalizationNo {
+class MaterialLocalizationNb extends GlobalMaterialLocalizations {
   /// Create an instance of the translation bundle for Norwegian Bokmål.
   ///
   /// For details on the meaning of the arguments, see [GlobalMaterialLocalizations].
@@ -18328,6 +18358,282 @@ class MaterialLocalizationNb extends MaterialLocalizationNo {
     decimalFormat: decimalFormat,
     twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat,
   );
+
+  @override
+  String get aboutListTileTitleRaw => 'Om \$applicationName';
+
+  @override
+  String get alertDialogLabel => 'Varsel';
+
+  @override
+  String get anteMeridiemAbbreviation => 'AM';
+
+  @override
+  String get backButtonTooltip => 'Tilbake';
+
+  @override
+  String get calendarModeButtonLabel => 'Bytt til kalender';
+
+  @override
+  String get cancelButtonLabel => 'AVBRYT';
+
+  @override
+  String get closeButtonLabel => 'LUKK';
+
+  @override
+  String get closeButtonTooltip => 'Lukk';
+
+  @override
+  String get collapsedIconTapHint => 'Vis';
+
+  @override
+  String get continueButtonLabel => 'FORTSETT';
+
+  @override
+  String get copyButtonLabel => 'Kopiér';
+
+  @override
+  String get cutButtonLabel => 'Klipp ut';
+
+  @override
+  String get dateHelpText => 'mm/dd/åååå';
+
+  @override
+  String get dateInputLabel => 'Skriv inn datoen';
+
+  @override
+  String get dateOutOfRangeLabel => 'Utenfor perioden.';
+
+  @override
+  String get datePickerHelpText => 'VELG DATOEN';
+
+  @override
+  String get dateRangeEndDateSemanticLabelRaw => 'Sluttdato \$fullDate';
+
+  @override
+  String get dateRangeEndLabel => 'Sluttdato';
+
+  @override
+  String get dateRangePickerHelpText => 'VELG PERIODEN';
+
+  @override
+  String get dateRangeStartDateSemanticLabelRaw => 'Startdato \$fullDate';
+
+  @override
+  String get dateRangeStartLabel => 'Startdato';
+
+  @override
+  String get dateSeparator => '/';
+
+  @override
+  String get deleteButtonTooltip => 'Slett';
+
+  @override
+  String get dialModeButtonLabel => 'Bytt til modus for valg fra urskive';
+
+  @override
+  String get dialogLabel => 'Dialogboks';
+
+  @override
+  String get drawerLabel => 'Navigasjonsmeny';
+
+  @override
+  String get expandedIconTapHint => 'Skjul';
+
+  @override
+  String get hideAccountsLabel => 'Skjul kontoer';
+
+  @override
+  String get inputDateModeButtonLabel => 'Bytt til innskriving';
+
+  @override
+  String get inputTimeModeButtonLabel => 'Bytt til tekstinndatamodus';
+
+  @override
+  String get invalidDateFormatLabel => 'Ugyldig format.';
+
+  @override
+  String get invalidDateRangeLabel => 'Ugyldig periode.';
+
+  @override
+  String get invalidTimeLabel => 'Angi et gyldig klokkeslett';
+
+  @override
+  String get licensesPackageDetailTextFew => null;
+
+  @override
+  String get licensesPackageDetailTextMany => null;
+
+  @override
+  String get licensesPackageDetailTextOne => '1 lisens';
+
+  @override
+  String get licensesPackageDetailTextOther => '\$licenseCount lisenser';
+
+  @override
+  String get licensesPackageDetailTextTwo => null;
+
+  @override
+  String get licensesPackageDetailTextZero => null;
+
+  @override
+  String get licensesPageTitle => 'Lisenser';
+
+  @override
+  String get modalBarrierDismissLabel => 'Avvis';
+
+  @override
+  String get moreButtonTooltip => 'Mer';
+
+  @override
+  String get nextMonthTooltip => 'Neste måned';
+
+  @override
+  String get nextPageTooltip => 'Neste side';
+
+  @override
+  String get okButtonLabel => 'OK';
+
+  @override
+  String get openAppDrawerTooltip => 'Åpne navigasjonsmenyen';
+
+  @override
+  String get pageRowsInfoTitleRaw => '\$firstRow–\$lastRow av \$rowCount';
+
+  @override
+  String get pageRowsInfoTitleApproximateRaw => '\$firstRow–\$lastRow av omtrent \$rowCount';
+
+  @override
+  String get pasteButtonLabel => 'Lim inn';
+
+  @override
+  String get popupMenuLabel => 'Forgrunnsmeny';
+
+  @override
+  String get postMeridiemAbbreviation => 'PM';
+
+  @override
+  String get previousMonthTooltip => 'Forrige måned';
+
+  @override
+  String get previousPageTooltip => 'Forrige side';
+
+  @override
+  String get refreshIndicatorSemanticLabel => 'Laster inn på nytt';
+
+  @override
+  String get remainingTextFieldCharacterCountFew => null;
+
+  @override
+  String get remainingTextFieldCharacterCountMany => null;
+
+  @override
+  String get remainingTextFieldCharacterCountOne => '1 tegn gjenstår';
+
+  @override
+  String get remainingTextFieldCharacterCountOther => '\$remainingCount tegn gjenstår';
+
+  @override
+  String get remainingTextFieldCharacterCountTwo => null;
+
+  @override
+  String get remainingTextFieldCharacterCountZero => null;
+
+  @override
+  String get reorderItemDown => 'Flytt ned';
+
+  @override
+  String get reorderItemLeft => 'Flytt til venstre';
+
+  @override
+  String get reorderItemRight => 'Flytt til høyre';
+
+  @override
+  String get reorderItemToEnd => 'Flytt til slutten';
+
+  @override
+  String get reorderItemToStart => 'Flytt til starten';
+
+  @override
+  String get reorderItemUp => 'Flytt opp';
+
+  @override
+  String get rowsPerPageTitle => 'Rader per side:';
+
+  @override
+  String get saveButtonLabel => 'LAGRE';
+
+  @override
+  ScriptCategory get scriptCategory => ScriptCategory.englishLike;
+
+  @override
+  String get searchFieldLabel => 'Søk';
+
+  @override
+  String get selectAllButtonLabel => 'Velg alle';
+
+  @override
+  String get selectYearSemanticsLabel => 'Velg året';
+
+  @override
+  String get selectedRowCountTitleFew => null;
+
+  @override
+  String get selectedRowCountTitleMany => null;
+
+  @override
+  String get selectedRowCountTitleOne => '1 element er valgt';
+
+  @override
+  String get selectedRowCountTitleOther => '\$selectedRowCount elementer er valgt';
+
+  @override
+  String get selectedRowCountTitleTwo => null;
+
+  @override
+  String get selectedRowCountTitleZero => null;
+
+  @override
+  String get showAccountsLabel => 'Vis kontoer';
+
+  @override
+  String get showMenuTooltip => 'Vis meny';
+
+  @override
+  String get signedInLabel => 'Pålogget';
+
+  @override
+  String get tabLabelRaw => 'Fane \$tabIndex av \$tabCount';
+
+  @override
+  TimeOfDayFormat get timeOfDayFormatRaw => TimeOfDayFormat.HH_colon_mm;
+
+  @override
+  String get timePickerDialHelpText => 'VELG KLOKKESLETT';
+
+  @override
+  String get timePickerHourLabel => 'Time';
+
+  @override
+  String get timePickerHourModeAnnouncement => 'Angi timer';
+
+  @override
+  String get timePickerInputHelpText => 'ANGI ET KLOKKESLETT';
+
+  @override
+  String get timePickerMinuteLabel => 'Minutt';
+
+  @override
+  String get timePickerMinuteModeAnnouncement => 'Angi minutter';
+
+  @override
+  String get unspecifiedDate => 'Dato';
+
+  @override
+  String get unspecifiedDateRange => 'Datoperiode';
+
+  @override
+  String get viewLicensesButtonLabel => 'SE LISENSER';
 }
 
 /// The translations for Nepali (`ne`).
@@ -19075,6 +19381,18 @@ class MaterialLocalizationNo extends GlobalMaterialLocalizations {
 
   @override
   String get licensesPackageDetailTextMany => null;
+<<<<<<< HEAD
+
+  @override
+  String get licensesPackageDetailTextOne => '1 lisens';
+
+  @override
+  String get licensesPackageDetailTextOther => '\$licenseCount lisenser';
+
+  @override
+  String get licensesPackageDetailTextTwo => null;
+=======
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
 
   @override
   String get licensesPackageDetailTextOne => '1 lisens';
@@ -19086,7 +19404,7 @@ class MaterialLocalizationNo extends GlobalMaterialLocalizations {
   String get licensesPackageDetailTextTwo => null;
 
   @override
-  String get licensesPackageDetailTextZero => 'No licenses';
+  String get licensesPackageDetailTextZero => null;
 
   @override
   String get licensesPageTitle => 'Lisenser';
@@ -19149,7 +19467,7 @@ class MaterialLocalizationNo extends GlobalMaterialLocalizations {
   String get remainingTextFieldCharacterCountTwo => null;
 
   @override
-  String get remainingTextFieldCharacterCountZero => 'TBD';
+  String get remainingTextFieldCharacterCountZero => null;
 
   @override
   String get reorderItemDown => 'Flytt ned';
@@ -20220,7 +20538,7 @@ class MaterialLocalizationPs extends GlobalMaterialLocalizations {
   String get closeButtonTooltip => 'بنده';
 
   @override
-  String get collapsedIconTapHint => 'TBD';
+  String get collapsedIconTapHint => 'Expand';
 
   @override
   String get continueButtonLabel => 'منځپانګې';
@@ -20274,7 +20592,7 @@ class MaterialLocalizationPs extends GlobalMaterialLocalizations {
   String get drawerLabel => 'د نیویگیشن مینو';
 
   @override
-  String get expandedIconTapHint => 'TBD';
+  String get expandedIconTapHint => 'Collapse';
 
   @override
   String get hideAccountsLabel => 'حسابونه پټ کړئ';
@@ -20319,7 +20637,7 @@ class MaterialLocalizationPs extends GlobalMaterialLocalizations {
   String get modalBarrierDismissLabel => 'رد کړه';
 
   @override
-  String get moreButtonTooltip => 'TBD';
+  String get moreButtonTooltip => 'More';
 
   @override
   String get nextMonthTooltip => 'بله میاشت';
@@ -20355,7 +20673,7 @@ class MaterialLocalizationPs extends GlobalMaterialLocalizations {
   String get previousPageTooltip => 'مخکینی مخ';
 
   @override
-  String get refreshIndicatorSemanticLabel => 'TBD';
+  String get refreshIndicatorSemanticLabel => 'Refresh';
 
   @override
   String get remainingTextFieldCharacterCountFew => null;
@@ -20364,34 +20682,34 @@ class MaterialLocalizationPs extends GlobalMaterialLocalizations {
   String get remainingTextFieldCharacterCountMany => null;
 
   @override
-  String get remainingTextFieldCharacterCountOne => 'TBD';
+  String get remainingTextFieldCharacterCountOne => '1 character remaining';
 
   @override
-  String get remainingTextFieldCharacterCountOther => 'TBD';
+  String get remainingTextFieldCharacterCountOther => '\$remainingCount characters remaining';
 
   @override
   String get remainingTextFieldCharacterCountTwo => null;
 
   @override
-  String get remainingTextFieldCharacterCountZero => 'TBD';
+  String get remainingTextFieldCharacterCountZero => 'No characters remaining';
 
   @override
-  String get reorderItemDown => 'TBD';
+  String get reorderItemDown => 'Move down';
 
   @override
-  String get reorderItemLeft => 'TBD';
+  String get reorderItemLeft => 'Move left';
 
   @override
-  String get reorderItemRight => 'TBD';
+  String get reorderItemRight => 'Move right';
 
   @override
-  String get reorderItemToEnd => 'TBD';
+  String get reorderItemToEnd => 'Move to the end';
 
   @override
-  String get reorderItemToStart => 'TBD';
+  String get reorderItemToStart => 'Move to the start';
 
   @override
-  String get reorderItemUp => 'TBD';
+  String get reorderItemUp => 'Move up';
 
   @override
   String get rowsPerPageTitle => 'د هرې پاڼې پاڼې:';
@@ -22858,6 +23176,7 @@ class MaterialLocalizationSr extends GlobalMaterialLocalizations {
 
   @override
   String get inputTimeModeButtonLabel => 'Пређите на режим уноса текста';
+<<<<<<< HEAD
 
   @override
   String get invalidDateFormatLabel => 'Формат је неважећи.';
@@ -22866,6 +23185,22 @@ class MaterialLocalizationSr extends GlobalMaterialLocalizations {
   String get invalidDateRangeLabel => 'Период је неважећи.';
 
   @override
+  String get invalidTimeLabel => 'Унесите важеће време';
+=======
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
+
+  @override
+  String get licensesPackageDetailTextFew => '\$licenseCount лиценце';
+
+  @override
+  String get licensesPackageDetailTextMany => null;
+
+  @override
+<<<<<<< HEAD
+  String get licensesPackageDetailTextOne => '1 лиценца';
+
+  @override
+=======
   String get invalidTimeLabel => 'Унесите важеће време';
 
   @override
@@ -22878,6 +23213,7 @@ class MaterialLocalizationSr extends GlobalMaterialLocalizations {
   String get licensesPackageDetailTextOne => '1 лиценца';
 
   @override
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
   String get licensesPackageDetailTextOther => '\$licenseCount лиценци';
 
   @override
@@ -27883,7 +28219,7 @@ final Set<String> kMaterialSupportedLanguages = HashSet<String>.from(const <Stri
 ///  * `mr` - Marathi
 ///  * `ms` - Malay
 ///  * `my` - Burmese
-///  * `nb` - Norwegian Bokmål, which, in this library, is a synonym of `no`
+///  * `nb` - Norwegian Bokmål
 ///  * `ne` - Nepali
 ///  * `nl` - Dutch Flemish
 ///  * `no` - Norwegian
@@ -28099,6 +28435,8 @@ GlobalMaterialLocalizations getMaterialTranslation(
       return MaterialLocalizationMs(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
     case 'my':
       return MaterialLocalizationMy(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
+    case 'nb':
+      return MaterialLocalizationNb(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
     case 'ne':
       return MaterialLocalizationNe(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
     case 'nl':
@@ -28190,8 +28528,6 @@ GlobalMaterialLocalizations getMaterialTranslation(
     }
     case 'zu':
       return MaterialLocalizationZu(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
-    case 'nb':
-      return MaterialLocalizationNb(fullYearFormat: fullYearFormat, compactDateFormat: compactDateFormat, shortDateFormat: shortDateFormat, mediumDateFormat: mediumDateFormat, longDateFormat: longDateFormat, yearMonthFormat: yearMonthFormat, shortMonthDayFormat: shortMonthDayFormat, decimalFormat: decimalFormat, twoDigitZeroPaddedFormat: twoDigitZeroPaddedFormat);
   }
   assert(false, 'getMaterialTranslation() called for unsupported locale "$locale"');
   return null;

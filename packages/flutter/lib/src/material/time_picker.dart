@@ -11,8 +11,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'button_bar.dart';
-import 'button_theme.dart';
 import 'color_scheme.dart';
 import 'colors.dart';
 import 'constants.dart';
@@ -20,7 +18,6 @@ import 'curves.dart';
 import 'debug.dart';
 import 'dialog.dart';
 import 'feedback.dart';
-import 'flat_button.dart';
 import 'icon_button.dart';
 import 'icons.dart';
 import 'ink_well.dart';
@@ -29,6 +26,7 @@ import 'input_decorator.dart';
 import 'material.dart';
 import 'material_localizations.dart';
 import 'material_state.dart';
+import 'text_button.dart';
 import 'text_form_field.dart';
 import 'text_theme.dart';
 import 'theme.dart';
@@ -1906,19 +1904,24 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
               : MaterialLocalizations.of(context).dialModeButtonLabel,
         ),
         Expanded(
-          // TODO(rami-a): Move away from ButtonBar to avoid https://github.com/flutter/flutter/issues/53378.
-          child: ButtonBar(
-            layoutBehavior: ButtonBarLayoutBehavior.constrained,
-            children: <Widget>[
-              FlatButton(
-                onPressed: _handleCancel,
-                child: Text(widget.cancelText ?? localizations.cancelButtonLabel),
-              ),
-              FlatButton(
-                onPressed: _handleOk,
-                child: Text(widget.confirmText ?? localizations.okButtonLabel),
-              ),
-            ],
+          child: Container(
+            alignment: AlignmentDirectional.centerEnd,
+            constraints: const BoxConstraints(minHeight: 52.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: OverflowBar(
+              spacing: 8,
+              overflowAlignment: OverflowBarAlignment.end,
+              children: <Widget>[
+                TextButton(
+                  onPressed: _handleCancel,
+                  child: Text(widget.cancelText ?? localizations.cancelButtonLabel),
+                ),
+                TextButton(
+                  onPressed: _handleOk,
+                  child: Text(widget.confirmText ?? localizations.okButtonLabel),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -2060,12 +2063,16 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
 /// to add inherited widgets like [Localizations.override],
 /// [Directionality], or [MediaQuery].
 ///
-/// The [entryMode] parameter can be used to
+/// The `initialEntryMode` parameter can be used to
 /// determine the initial time entry selection of the picker (either a clock
 /// dial or text input).
 ///
 /// Optional strings for the [helpText], [cancelText], and [confirmText] can be
 /// provided to override the default values.
+///
+/// By default, the time picker gets its colors from the overall theme's
+/// [ColorScheme]. The time picker can be further customized by providing a
+/// [TimePickerThemeData] to the overall theme.
 ///
 /// {@tool snippet}
 /// Show a dialog with the text direction overridden to be [TextDirection.rtl].
@@ -2105,6 +2112,8 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
 ///
 ///  * [showDatePicker], which shows a dialog that contains a material design
 ///    date picker.
+///  * [TimePickerThemeData], which allows you to customize the colors,
+///    typography, and shape of the time picker.
 Future<TimeOfDay> showTimePicker({
   @required BuildContext context,
   @required TimeOfDay initialTime,

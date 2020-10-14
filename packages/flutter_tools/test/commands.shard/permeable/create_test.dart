@@ -10,6 +10,7 @@ import 'package:args/command_runner.dart';
 import 'package:flutter_tools/src/artifacts.dart';
 import 'package:flutter_tools/src/base/file_system.dart';
 import 'package:flutter_tools/src/base/io.dart';
+import 'package:flutter_tools/src/base/logger.dart';
 import 'package:flutter_tools/src/base/net.dart';
 import 'package:flutter_tools/src/base/platform.dart';
 import 'package:flutter_tools/src/build_info.dart';
@@ -48,6 +49,7 @@ void main() {
   Directory projectDir;
   FlutterVersion mockFlutterVersion;
   LoggingProcessManager loggingProcessManager;
+  BufferLogger logger;
 
   setUpAll(() async {
     Cache.disableLocking();
@@ -56,6 +58,7 @@ void main() {
 
   setUp(() {
     loggingProcessManager = LoggingProcessManager();
+    logger = BufferLogger.test();
     tempDir = globals.fs.systemTempDirectory.createTempSync('flutter_tools_create_test.');
     projectDir = tempDir.childDirectory('flutter_project');
     mockFlutterVersion = MockFlutterVersion();
@@ -651,6 +654,31 @@ void main() {
     expect(actualContents.contains('useAndroidX'), true);
   });
 
+  testUsingContext('creating a new project should create v2 embedding and never show an Android v1 deprecation warning', () async {
+    Cache.flutterRoot = '../..';
+    when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
+    when(mockFlutterVersion.channel).thenReturn(frameworkChannel);
+
+    final CreateCommand command = CreateCommand();
+    final CommandRunner<void> runner = createTestCommandRunner(command);
+
+    await runner.run(<String>['create', '--no-pub', '--platforms', 'android', projectDir.path]);
+
+    final String androidManifest = await globals.fs.file(
+      projectDir.path + '/android/app/src/main/AndroidManifest.xml'
+    ).readAsString();
+    expect(androidManifest.contains('android:name="flutterEmbedding"'), true);
+    expect(androidManifest.contains('android:value="2"'), true);
+
+    final String mainActivity = await globals.fs.file(
+      projectDir.path +  '/android/app/src/main/kotlin/com/example/flutter_project/MainActivity.kt'
+    ).readAsString();
+    // Import for the new embedding class.
+    expect(mainActivity.contains('import io.flutter.embedding.android.FlutterActivity'), true);
+
+    expect(testLogger.statusText, isNot(contains('https://flutter.dev/go/android-project-migration')));
+  });
+
   testUsingContext('app supports Linux if requested', () async {
     Cache.flutterRoot = '../..';
     when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
@@ -1038,7 +1066,7 @@ void main() {
     Platform: _kNoColorTerminalPlatform,
   });
 
-  testUsingContext('has correct application id for android and bundle id for ios', () async {
+  testUsingContext('has correct application id for android, bundle id for ios and application id for Linux', () async {
     Cache.flutterRoot = '../..';
     when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
     when(mockFlutterVersion.channel).thenReturn(frameworkChannel);
@@ -1069,6 +1097,10 @@ void main() {
         project.android.applicationId,
         'com.example.hello_flutter',
     );
+    expect(
+        project.linux.applicationId,
+        'com.example.hello_flutter',
+    );
 
     tmpProjectDir = globals.fs.path.join(tempDir.path, 'test_abc');
     await runner.run(<String>['create', '--template=app', '--no-pub', '--org', 'abc^*.1#@', tmpProjectDir]);
@@ -1093,9 +1125,14 @@ void main() {
         project.android.applicationId,
         'flutter_project.untitled',
     );
+    expect(
+        project.linux.applicationId,
+        'flutter_project.untitled',
+    );
   }, overrides: <Type, Generator>{
     FlutterVersion: () => mockFlutterVersion,
     Platform: _kNoColorTerminalPlatform,
+    FeatureFlags: () => TestFeatureFlags(isLinuxEnabled: true),
   });
 
   testUsingContext('can re-gen default template over existing project', () async {
@@ -1532,6 +1569,11 @@ void main() {
 
     await runner.run(<String>['create', '--no-pub', '--template=plugin', projectDir.path]);
 
+<<<<<<< HEAD
+=======
+    // TODO(cyanglaz): no-op iOS folder should be removed after 1.20.0 release
+    // https://github.com/flutter/flutter/issues/59787
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
     expect(projectDir.childDirectory('ios').existsSync(), false);
     expect(projectDir.childDirectory('android').existsSync(), false);
     expect(projectDir.childDirectory('web').existsSync(), false);
@@ -1539,6 +1581,11 @@ void main() {
     expect(projectDir.childDirectory('windows').existsSync(), false);
     expect(projectDir.childDirectory('macos').existsSync(), false);
 
+<<<<<<< HEAD
+=======
+    // TODO(cyanglaz): no-op iOS folder should be removed after 1.20.0 release
+    // https://github.com/flutter/flutter/issues/59787
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
     expect(projectDir.childDirectory('example').childDirectory('ios').existsSync(), false);
     expect(projectDir.childDirectory('example').childDirectory('android').existsSync(), false);
     expect(projectDir.childDirectory('example').childDirectory('web').existsSync(), false);
@@ -1923,6 +1970,37 @@ void main() {
     FeatureFlags: () => TestFeatureFlags(isMacOSEnabled: true),
   });
 
+<<<<<<< HEAD
+=======
+  testUsingContext('flutter create -t plugin in an empty folder should not show pubspec.yaml updating suggestion', () async {
+    Cache.flutterRoot = '../..';
+    when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
+    when(mockFlutterVersion.channel).thenReturn(frameworkChannel);
+
+    final CreateCommand command = CreateCommand();
+    final CommandRunner<void> runner = createTestCommandRunner(command);
+    await runner.run(<String>['create', '--no-pub', '--template=plugin', '--platforms=android', projectDir.path]);
+    expect(logger.statusText, isNot(contains('The `pubspec.yaml` under the project directory must be updated to support')));
+  }, overrides: <Type, Generator> {
+    Logger: () => logger,
+  });
+
+  testUsingContext('flutter create -t plugin in an existing plugin should show pubspec.yaml updating suggestion', () async {
+    Cache.flutterRoot = '../..';
+    when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
+    when(mockFlutterVersion.channel).thenReturn(frameworkChannel);
+
+    final CreateCommand command = CreateCommand();
+    final CommandRunner<void> runner = createTestCommandRunner(command);
+    await runner.run(<String>['create', '--no-pub', '--template=plugin', '--platforms=ios', projectDir.path]);
+    expect(logger.statusText, isNot(contains('The `pubspec.yaml` under the project directory must be updated to support')));
+    await runner.run(<String>['create', '--no-pub', '--template=plugin', '--platforms=android', projectDir.path]);
+    expect(logger.statusText, contains('The `pubspec.yaml` under the project directory must be updated to support'));
+  }, overrides: <Type, Generator> {
+    Logger: () => logger,
+  });
+
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
   testUsingContext('newly created plugin has min flutter sdk version as 1.20.0', () async {
     Cache.flutterRoot = '../..';
     when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
@@ -1938,6 +2016,27 @@ void main() {
     expect(env['flutter'].allows(Version(1, 19, 0)), false);
   });
 
+<<<<<<< HEAD
+=======
+  testUsingContext('default app uses Android sdk 29', () async {
+    Cache.flutterRoot = '../..';
+    when(mockFlutterVersion.frameworkRevision).thenReturn(frameworkRevision);
+    when(mockFlutterVersion.channel).thenReturn(frameworkChannel);
+
+    final CreateCommand command = CreateCommand();
+    final CommandRunner<void> runner = createTestCommandRunner(command);
+
+    await runner.run(<String>['create', '--no-pub', projectDir.path]);
+
+    expect(globals.fs.isFileSync('${projectDir.path}/android/app/build.gradle'), true);
+
+    final String buildContent = await globals.fs.file(projectDir.path + '/android/app/build.gradle').readAsString();
+
+    expect(buildContent.contains('compileSdkVersion 29'), true);
+    expect(buildContent.contains('targetSdkVersion 29'), true);
+  });
+
+>>>>>>> f30b7f4db93ee747cd727df747941a28ead25ff5
 }
 
 Future<void> _createProject(

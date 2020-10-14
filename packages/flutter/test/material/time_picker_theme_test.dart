@@ -428,7 +428,7 @@ class _TimePickerLauncher extends StatelessWidget {
         child: Center(
           child: Builder(
               builder: (BuildContext context) {
-                return RaisedButton(
+                return ElevatedButton(
                   child: const Text('X'),
                   onPressed: () async {
                     await showTimePicker(
